@@ -19,7 +19,7 @@ function applyPatch {
     cd "$basedir/$target"
     echo "Resetting $target to $what..."
     git remote add -f upstream ../$what >/dev/null 2>&1
-    git checkout master >/dev/null 2>&1
+    git checkout -B master >/dev/null 2>&1
     git fetch upstream >/dev/null 2>&1
     git reset --hard upstream/upstream
     echo "  Applying patches to $target..."
@@ -37,3 +37,4 @@ function applyPatch {
 
 applyPatch Bukkit Spigot-API HEAD && applyPatch CraftBukkit Spigot-Server patched
 applyPatch Spigot-API PaperSpigot-API HEAD && applyPatch Spigot-Server PaperSpigot-Server HEAD
+applyPatch PaperSpigot-API KrokroPaper-API HEAD && applyPatch PaperSpigot-Server KrokroPaper-Server HEAD

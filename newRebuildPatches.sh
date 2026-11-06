@@ -36,7 +36,7 @@ function savePatches {
     echo "  Patches saved for $what to $what-Patches/"
 }
 if [ "$1" == "clean" ]; then
-	rm -rf Spigot-*-Patches
+	rm -rf PaperSpigot-*-Patches
 fi
-savePatches Spigot-API PaperSpigot-API
-savePatches Spigot-Server PaperSpigot-Server
+savePatches PaperSpigot-API KrokroPaper-API
+savePatches PaperSpigot-Server KrokroPaper-Server

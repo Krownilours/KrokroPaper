@@ -8,16 +8,6 @@ High performance Spigot fork that aims to fix gameplay and mechanics inconsisten
 
 
 
-How To (Server Admins)
-------
-Download a copy of Paperclip.jar from our buildserver here:
-https://ci.destroystokyo.com/job/PaperSpigot/
-
-Run the PaperClip jar directly from your server. Just like old times
-
-PaperSpigot requires **JRE 8** or above.
-
-
 How To (Compiling From Source)
 ------
 To compile PaperSpigot, you need JDK8, maven, and an internet connection.

@@ -1,0 +1,36 @@
+From dc9c408bf931cca16aa81bf40f9472720fcec37f Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Fri, 6 Nov 2026 21:30:54 +0000
+Subject: [PATCH] POM changes
+
+
+diff --git a/pom.xml b/pom.xml
+index fe9d6d26..3679dd8e 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -4,17 +4,17 @@
+     <modelVersion>4.0.0</modelVersion>
+ 
+     <parent>
+-        <groupId>org.github.paperspigot</groupId>
+-        <artifactId>paperspigot-parent</artifactId>
++        <groupId>com.github.krokropaper</groupId>
++        <artifactId>krokropaper-parent</artifactId>
+         <version>dev-SNAPSHOT</version>
+     </parent>
+ 
+-    <groupId>org.github.paperspigot</groupId>
+-    <artifactId>paperspigot-api</artifactId>
++    <groupId>com.github.krokropaper</groupId>
++    <artifactId>krokropaper-api</artifactId>
+     <version>1.8.8-R0.1-SNAPSHOT</version>
+     <packaging>jar</packaging>
+ 
+-    <name>PaperSpigot-API</name>
++    <name>KrokroPaper-API</name>
+     <url>https://hub.spigotmc.org/stash/projects/PAPER/</url>
+     <description>An enhanced plugin API for Minecraft servers.</description>
+ 
+-- 
+2.47.3
+

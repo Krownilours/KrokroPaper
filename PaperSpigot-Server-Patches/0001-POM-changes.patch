@@ -1,11 +1,11 @@
-From 949e81b4b46feae3f4e07172179d9dd828ed3308 Mon Sep 17 00:00:00 2001
+From f2c2649d85ee4dfbda4b440559e4a8590cd184ec Mon Sep 17 00:00:00 2001
 From: Krownilours <im4kingfr@gmail.com>
 Date: Fri, 6 Nov 2026 21:31:17 +0000
 Subject: [PATCH] POM changes
 
 
 diff --git a/pom.xml b/pom.xml
-index 644305e68..ca09a246c 100644
+index 644305e68..a2f5b541c 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -1,11 +1,11 @@
@@ -54,6 +54,15 @@ index 644305e68..ca09a246c 100644
                  <scmDirectory>..</scmDirectory>
              </configuration>
              <executions>
+@@ -229,7 +229,7 @@
+             <plugin>
+                 <groupId>net.md-5</groupId>
+                 <artifactId>specialsource-maven-plugin</artifactId>
+-		<version>1.2.3</version> <!-- paper - bump log4j -->
++		<version>1.2.4</version> <!-- paper - bump log4j -->
+                 <executions>
+                     <execution>
+                         <phase>package</phase>
 -- 
 2.47.3
 

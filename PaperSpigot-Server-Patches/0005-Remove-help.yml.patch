@@ -1,0 +1,28 @@
+From 541e08be214d5a97c4c361037ee4c125680e5abb Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Sat, 14 Nov 2026 18:40:34 +0000
+Subject: [PATCH] Remove help.yml
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/help/HelpYamlReader.java b/src/main/java/org/bukkit/craftbukkit/help/HelpYamlReader.java
+index 60a6221b4..d56b684e0 100644
+--- a/src/main/java/org/bukkit/craftbukkit/help/HelpYamlReader.java
++++ b/src/main/java/org/bukkit/craftbukkit/help/HelpYamlReader.java
+@@ -34,14 +34,6 @@ public class HelpYamlReader {
+             helpYaml = YamlConfiguration.loadConfiguration(helpYamlFile);
+             helpYaml.options().copyDefaults(true);
+             helpYaml.setDefaults(defaultConfig);
+-
+-            try {
+-                if (!helpYamlFile.exists()) {
+-                    helpYaml.save(helpYamlFile);
+-                }
+-            } catch (IOException ex) {
+-                server.getLogger().log(Level.SEVERE, "Could not save " + helpYamlFile, ex);
+-            }
+         } catch (Exception ex) {
+             server.getLogger().severe("Failed to load help.yml. Verify the yaml indentation is correct. Reverting to default help.yml.");
+             helpYaml = defaultConfig;
+-- 
+2.47.3
+

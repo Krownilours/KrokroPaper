@@ -1,0 +1,46 @@
+From 2babb2aea978d090571469cd0cccbdd5198e8634 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Sat, 14 Nov 2026 19:56:59 +0000
+Subject: [PATCH] Remove Mojang snooper timer
+
+
+diff --git a/src/main/java/net/minecraft/server/MojangStatisticsGenerator.java b/src/main/java/net/minecraft/server/MojangStatisticsGenerator.java
+index 076306d9e..2ef66f187 100644
+--- a/src/main/java/net/minecraft/server/MojangStatisticsGenerator.java
++++ b/src/main/java/net/minecraft/server/MojangStatisticsGenerator.java
+@@ -35,31 +35,13 @@ public class MojangStatisticsGenerator {
+ 
+         this.e = imojangstatistics;
+         this.h = i;
++        this.f.cancel();
+     }
+ 
+     public void a() {
+         if (!this.i) {
+             this.i = true;
+             this.h();
+-            this.f.schedule(new TimerTask() {
+-                public void run() {
+-                    if (MojangStatisticsGenerator.this.e.getSnooperEnabled()) {
+-                        HashMap hashmap;
+-
+-                        synchronized (MojangStatisticsGenerator.this.g) {
+-                            hashmap = Maps.newHashMap(MojangStatisticsGenerator.this.b);
+-                            if (MojangStatisticsGenerator.this.j == 0) {
+-                                hashmap.putAll(MojangStatisticsGenerator.this.a);
+-                            }
+-
+-                            hashmap.put("snooper_count", Integer.valueOf(MojangStatisticsGenerator.f(MojangStatisticsGenerator.this)));
+-                            hashmap.put("snooper_token", MojangStatisticsGenerator.this.c);
+-                        }
+-
+-                        HttpUtilities.a(MojangStatisticsGenerator.this.d, (Map) hashmap, true);
+-                    }
+-                }
+-            }, 0L, 900000L);
+         }
+     }
+ 
+-- 
+2.47.3
+

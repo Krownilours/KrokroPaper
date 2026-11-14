@@ -1,0 +1,54 @@
+From 098254f547a858805b861dfaf7a7be540b40174a Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Sat, 14 Nov 2026 13:34:14 +0000
+Subject: [PATCH] Remove Eclipse Compiler for Java
+
+
+diff --git a/pom.xml b/pom.xml
+index 0d08e7852..3be133b00 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -97,19 +97,6 @@
+         </dependency>
+     </dependencies>
+ 
+-    <!-- required until fixed plexus-compiler-eclipse is deployed -->
+-    <pluginRepositories>
+-        <pluginRepository>
+-            <id>spigotmc-public</id>
+-            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+-        </pluginRepository>
+-        <!-- PaperSpigot - Repo for gitdescribe -->
+-        <pluginRepository>
+-            <id>papermc</id> <!-- Paper - Update Log4j -->
+-            <url>https://papermc.io/repo/repository/maven-public/</url> <!-- Paper - Update Log4j -->
+-        </pluginRepository>
+-    </pluginRepositories>
+-
+     <!-- This builds a completely 'ready to start' jar with all dependencies inside -->
+     <build>
+         <defaultGoal>install</defaultGoal>
+@@ -248,20 +235,6 @@
+                 <artifactId>maven-compiler-plugin</artifactId>
+                 <!-- versions after this appear to be broken -->
+                 <version>3.1</version>
+-                <configuration>
+-                    <!-- we use the Eclipse compiler as it doesn't need a JDK -->
+-                    <compilerId>eclipse</compilerId>
+-                    <!-- source and target are ignored if this isn't true -->
+-                    <optimize>true</optimize>
+-                </configuration>
+-                <dependencies>
+-                    <!-- we need our custom version as it fixes some bugs on case sensitive file systems -->
+-                    <dependency>
+-                        <groupId>org.codehaus.plexus</groupId>
+-                        <artifactId>plexus-compiler-eclipse</artifactId>
+-                        <version>2.5.0-spigotmc</version>
+-                    </dependency>
+-                </dependencies>
+             </plugin>
+             <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+-- 
+2.47.3
+

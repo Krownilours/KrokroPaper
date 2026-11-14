@@ -1,0 +1,49 @@
+From ba4193dd22a500a79f953a7060e16ffc1dd5b1b9 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Sat, 14 Nov 2026 13:33:47 +0000
+Subject: [PATCH] Remove Eclipse Compiler for Java
+
+
+diff --git a/pom.xml b/pom.xml
+index 3679dd8e..6ebb1015 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -38,14 +38,6 @@
+         </snapshotRepository>
+     </distributionManagement>
+ 
+-    <!-- required until fixed plexus-compiler-eclipse is deployed -->
+-    <pluginRepositories>
+-        <pluginRepository>
+-            <id>spigotmc-public</id>
+-            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+-        </pluginRepository>
+-    </pluginRepositories>
+-
+     <dependencies>
+         <dependency>
+             <groupId>net.sf.trove4j</groupId>
+@@ -122,20 +114,6 @@
+                 <artifactId>maven-compiler-plugin</artifactId>
+                 <!-- versions after this appear to be broken -->
+                 <version>3.1</version>
+-                <configuration>
+-                    <!-- we use the Eclipse compiler as it doesn't need a JDK -->
+-                    <compilerId>eclipse</compilerId>
+-                    <!-- source and target are ignored if this isn't true -->
+-                    <optimize>true</optimize>
+-                </configuration>
+-                <dependencies>
+-                    <!-- we need our custom version as it fixes some bugs on case sensitive file systems -->
+-                    <dependency>
+-                        <groupId>org.codehaus.plexus</groupId>
+-                        <artifactId>plexus-compiler-eclipse</artifactId>
+-                        <version>2.5.0-spigotmc</version>
+-                    </dependency>
+-                </dependencies>
+             </plugin>
+             <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+-- 
+2.47.3
+

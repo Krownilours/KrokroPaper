@@ -1,0 +1,319 @@
+From 8c9f995e6cd943264d4466b28fc5b3eece07b48b Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Sat, 14 Nov 2026 14:07:04 +0000
+Subject: [PATCH] NMS imports
+
+
+diff --git a/src/main/java/net/minecraft/server/BlockBeacon.java b/src/main/java/net/minecraft/server/BlockBeacon.java
+new file mode 100644
+index 000000000..a73d7b13a
+--- /dev/null
++++ b/src/main/java/net/minecraft/server/BlockBeacon.java
+@@ -0,0 +1,96 @@
++package net.minecraft.server;
++
++public class BlockBeacon extends BlockContainer {
++
++    public BlockBeacon() {
++        super(Material.SHATTERABLE, MaterialMapColor.G);
++        this.c(3.0F);
++        this.a(CreativeModeTab.f);
++    }
++
++    public TileEntity a(World world, int i) {
++        return new TileEntityBeacon();
++    }
++
++    public boolean interact(World world, BlockPosition blockposition, IBlockData iblockdata, EntityHuman entityhuman, EnumDirection enumdirection, float f, float f1, float f2) {
++        if (world.isClientSide) {
++            return true;
++        } else {
++            TileEntity tileentity = world.getTileEntity(blockposition);
++
++            if (tileentity instanceof TileEntityBeacon) {
++                entityhuman.openContainer((TileEntityBeacon) tileentity);
++                entityhuman.b(StatisticList.N);
++            }
++
++            return true;
++        }
++    }
++
++    public boolean c() {
++        return false;
++    }
++
++    public boolean d() {
++        return false;
++    }
++
++    public int b() {
++        return 3;
++    }
++
++    public void postPlace(World world, BlockPosition blockposition, IBlockData iblockdata, EntityLiving entityliving, ItemStack itemstack) {
++        super.postPlace(world, blockposition, iblockdata, entityliving, itemstack);
++        if (itemstack.hasName()) {
++            TileEntity tileentity = world.getTileEntity(blockposition);
++
++            if (tileentity instanceof TileEntityBeacon) {
++                ((TileEntityBeacon) tileentity).a(itemstack.getName());
++            }
++        }
++
++    }
++
++    public void doPhysics(World world, BlockPosition blockposition, IBlockData iblockdata, Block block) {
++        TileEntity tileentity = world.getTileEntity(blockposition);
++
++        if (tileentity instanceof TileEntityBeacon) {
++            ((TileEntityBeacon) tileentity).m();
++            world.playBlockAction(blockposition, this, 1, 0);
++        }
++
++    }
++
++    public static void f(final World world, final BlockPosition blockposition) {
++        HttpUtilities.a.submit(new Runnable() {
++            public void run() {
++                Chunk chunk = world.getChunkAtWorldCoords(blockposition);
++
++                for (int i = blockposition.getY() - 1; i >= 0; --i) {
++                    final BlockPosition blockposition1 = new BlockPosition(blockposition.getX(), i, blockposition.getZ());
++
++                    if (!chunk.d(blockposition1)) {
++                        break;
++                    }
++
++                    IBlockData iblockdata = world.getType(blockposition1);
++
++                    if (iblockdata.getBlock() == Blocks.BEACON) {
++                        ((WorldServer) world).postToMainThread(new Runnable() {
++                            public void run() {
++                                TileEntity tileentity = world.getTileEntity(blockposition);
++
++                                if (tileentity instanceof TileEntityBeacon) {
++                                    ((TileEntityBeacon) tileentity).m();
++                                    world.playBlockAction(blockposition, Blocks.BEACON, 1, 0);
++                                }
++
++                            }
++                        });
++                    }
++                }
++
++            }
++        });
++    }
++}
+diff --git a/src/main/java/net/minecraft/server/EULA.java b/src/main/java/net/minecraft/server/EULA.java
+new file mode 100644
+index 000000000..c872029df
+--- /dev/null
++++ b/src/main/java/net/minecraft/server/EULA.java
+@@ -0,0 +1,62 @@
++package net.minecraft.server;
++
++import java.io.File;
++import java.io.FileInputStream;
++import java.io.FileOutputStream;
++import java.util.Properties;
++import org.apache.commons.io.IOUtils;
++import org.apache.logging.log4j.LogManager;
++import org.apache.logging.log4j.Logger;
++
++public class EULA {
++
++    private static final Logger a = LogManager.getLogger();
++    private final File b;
++    private final boolean c;
++
++    public EULA(File file) {
++        this.b = file;
++        this.c = this.a(file);
++    }
++
++    private boolean a(File file) {
++        FileInputStream fileinputstream = null;
++        boolean flag = false;
++
++        try {
++            Properties properties = new Properties();
++
++            fileinputstream = new FileInputStream(file);
++            properties.load(fileinputstream);
++            flag = Boolean.parseBoolean(properties.getProperty("eula", "false"));
++        } catch (Exception exception) {
++            EULA.a.warn("Failed to load " + file);
++            this.b();
++        } finally {
++            IOUtils.closeQuietly(fileinputstream);
++        }
++
++        return flag;
++    }
++
++    public boolean a() {
++        return this.c;
++    }
++
++    public void b() {
++        FileOutputStream fileoutputstream = null;
++
++        try {
++            Properties properties = new Properties();
++
++            fileoutputstream = new FileOutputStream(this.b);
++            properties.setProperty("eula", "false");
++            properties.store(fileoutputstream, "By changing the setting below to TRUE you are indicating your agreement to our EULA (https://account.mojang.com/documents/minecraft_eula).");
++        } catch (Exception exception) {
++            EULA.a.warn("Failed to save " + this.b, exception);
++        } finally {
++            IOUtils.closeQuietly(fileoutputstream);
++        }
++
++    }
++}
+diff --git a/src/main/java/net/minecraft/server/MojangStatisticsGenerator.java b/src/main/java/net/minecraft/server/MojangStatisticsGenerator.java
+new file mode 100644
+index 000000000..076306d9e
+--- /dev/null
++++ b/src/main/java/net/minecraft/server/MojangStatisticsGenerator.java
+@@ -0,0 +1,134 @@
++package net.minecraft.server;
++
++import com.google.common.collect.Maps;
++import java.lang.management.ManagementFactory;
++import java.lang.management.RuntimeMXBean;
++import java.net.MalformedURLException;
++import java.net.URL;
++import java.util.HashMap;
++import java.util.Iterator;
++import java.util.List;
++import java.util.Map;
++import java.util.Timer;
++import java.util.TimerTask;
++import java.util.UUID;
++
++public class MojangStatisticsGenerator {
++
++    private final Map<String, Object> a = Maps.newHashMap();
++    private final Map<String, Object> b = Maps.newHashMap();
++    private final String c = UUID.randomUUID().toString();
++    private final URL d;
++    private final IMojangStatistics e;
++    private final Timer f = new Timer("Snooper Timer", true);
++    private final Object g = new Object();
++    private final long h;
++    private boolean i;
++    private int j;
++
++    public MojangStatisticsGenerator(String s, IMojangStatistics imojangstatistics, long i) {
++        try {
++            this.d = new URL("http://snoop.minecraft.net/" + s + "?version=" + 2);
++        } catch (MalformedURLException malformedurlexception) {
++            throw new IllegalArgumentException();
++        }
++
++        this.e = imojangstatistics;
++        this.h = i;
++    }
++
++    public void a() {
++        if (!this.i) {
++            this.i = true;
++            this.h();
++            this.f.schedule(new TimerTask() {
++                public void run() {
++                    if (MojangStatisticsGenerator.this.e.getSnooperEnabled()) {
++                        HashMap hashmap;
++
++                        synchronized (MojangStatisticsGenerator.this.g) {
++                            hashmap = Maps.newHashMap(MojangStatisticsGenerator.this.b);
++                            if (MojangStatisticsGenerator.this.j == 0) {
++                                hashmap.putAll(MojangStatisticsGenerator.this.a);
++                            }
++
++                            hashmap.put("snooper_count", Integer.valueOf(MojangStatisticsGenerator.f(MojangStatisticsGenerator.this)));
++                            hashmap.put("snooper_token", MojangStatisticsGenerator.this.c);
++                        }
++
++                        HttpUtilities.a(MojangStatisticsGenerator.this.d, (Map) hashmap, true);
++                    }
++                }
++            }, 0L, 900000L);
++        }
++    }
++
++    private void h() {
++        this.i();
++        this.a("snooper_token", this.c);
++        this.b("snooper_token", this.c);
++        this.b("os_name", System.getProperty("os.name"));
++        this.b("os_version", System.getProperty("os.version"));
++        this.b("os_architecture", System.getProperty("os.arch"));
++        this.b("java_version", System.getProperty("java.version"));
++        this.a("version", "1.8.8");
++        this.e.b(this);
++    }
++
++    private void i() {
++        RuntimeMXBean runtimemxbean = ManagementFactory.getRuntimeMXBean();
++        List list = runtimemxbean.getInputArguments();
++        int i = 0;
++        Iterator iterator = list.iterator();
++
++        while (iterator.hasNext()) {
++            String s = (String) iterator.next();
++
++            if (s.startsWith("-X")) {
++                this.a("jvm_arg[" + i++ + "]", s);
++            }
++        }
++
++        this.a("jvm_args", Integer.valueOf(i));
++    }
++
++    public void b() {
++        this.b("memory_total", Long.valueOf(Runtime.getRuntime().totalMemory()));
++        this.b("memory_max", Long.valueOf(Runtime.getRuntime().maxMemory()));
++        this.b("memory_free", Long.valueOf(Runtime.getRuntime().freeMemory()));
++        this.b("cpu_cores", Integer.valueOf(Runtime.getRuntime().availableProcessors()));
++        this.e.a(this);
++    }
++
++    public void a(String s, Object object) {
++        Object object1 = this.g;
++
++        synchronized (this.g) {
++            this.b.put(s, object);
++        }
++    }
++
++    public void b(String s, Object object) {
++        Object object1 = this.g;
++
++        synchronized (this.g) {
++            this.a.put(s, object);
++        }
++    }
++
++    public boolean d() {
++        return this.i;
++    }
++
++    public void e() {
++        this.f.cancel();
++    }
++
++    public long g() {
++        return this.h;
++    }
++
++    static int f(MojangStatisticsGenerator mojangstatisticsgenerator) {
++        return mojangstatisticsgenerator.j++;
++    }
++}
+-- 
+2.47.3
+

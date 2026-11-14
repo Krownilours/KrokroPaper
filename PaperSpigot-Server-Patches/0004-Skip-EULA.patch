@@ -1,0 +1,83 @@
+From 748350c82bc1fe1ebc32a3d34269e307cf3bea8f Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Sat, 14 Nov 2026 18:28:51 +0000
+Subject: [PATCH] Skip EULA
+
+
+diff --git a/src/main/java/net/minecraft/server/DedicatedServer.java b/src/main/java/net/minecraft/server/DedicatedServer.java
+index 088beb22b..a66cd913f 100644
+--- a/src/main/java/net/minecraft/server/DedicatedServer.java
++++ b/src/main/java/net/minecraft/server/DedicatedServer.java
+@@ -123,18 +123,7 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
+         DedicatedServer.LOGGER.info("Loading properties");
+         this.propertyManager = new PropertyManager(this.options); // CraftBukkit - CLI argument support
+         this.p = new EULA(new File("eula.txt"));
+-        // Spigot Start
+-        boolean eulaAgreed = Boolean.getBoolean( "com.mojang.eula.agree" );
+-        if ( eulaAgreed )
+-        {
+-            System.err.println( "You have used the Spigot command line EULA agreement flag." );
+-            System.err.println( "By using this setting you are indicating your agreement to Mojang's EULA (https://account.mojang.com/documents/minecraft_eula)." );
+-            System.err.println( "If you do not agree to the above EULA please stop your server and remove this flag immediately." );
+-        }
+-        // Spigot End
+-        if (!this.p.a() && !eulaAgreed) { // Spigot
+-            DedicatedServer.LOGGER.info("You need to agree to the EULA in order to run the server. Go to eula.txt for more info.");
+-            this.p.b();
++        if (false) {
+             return false;
+         } else {
+             if (this.T()) {
+diff --git a/src/main/java/net/minecraft/server/EULA.java b/src/main/java/net/minecraft/server/EULA.java
+index c872029df..e698fdf8f 100644
+--- a/src/main/java/net/minecraft/server/EULA.java
++++ b/src/main/java/net/minecraft/server/EULA.java
+@@ -20,43 +20,13 @@ public class EULA {
+     }
+ 
+     private boolean a(File file) {
+-        FileInputStream fileinputstream = null;
+-        boolean flag = false;
+-
+-        try {
+-            Properties properties = new Properties();
+-
+-            fileinputstream = new FileInputStream(file);
+-            properties.load(fileinputstream);
+-            flag = Boolean.parseBoolean(properties.getProperty("eula", "false"));
+-        } catch (Exception exception) {
+-            EULA.a.warn("Failed to load " + file);
+-            this.b();
+-        } finally {
+-            IOUtils.closeQuietly(fileinputstream);
+-        }
+-
+-        return flag;
++        return true;
+     }
+ 
+     public boolean a() {
+-        return this.c;
++        return true;
+     }
+ 
+     public void b() {
+-        FileOutputStream fileoutputstream = null;
+-
+-        try {
+-            Properties properties = new Properties();
+-
+-            fileoutputstream = new FileOutputStream(this.b);
+-            properties.setProperty("eula", "false");
+-            properties.store(fileoutputstream, "By changing the setting below to TRUE you are indicating your agreement to our EULA (https://account.mojang.com/documents/minecraft_eula).");
+-        } catch (Exception exception) {
+-            EULA.a.warn("Failed to save " + this.b, exception);
+-        } finally {
+-            IOUtils.closeQuietly(fileoutputstream);
+-        }
+-
+     }
+ }
+-- 
+2.47.3
+

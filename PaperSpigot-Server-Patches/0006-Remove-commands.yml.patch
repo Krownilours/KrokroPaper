@@ -1,0 +1,37 @@
+From 8903d42d88cc88b82e10947a93155fc76888235e Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Sat, 14 Nov 2026 19:00:30 +0000
+Subject: [PATCH] Remove commands.yml
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index 69485fa69..e6950802f 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -277,11 +277,6 @@ public final class CraftServer implements Server {
+     }
+ 
+     private void saveCommandsConfig() {
+-        try {
+-            commandsConfiguration.save(getCommandsConfigFile());
+-        } catch (IOException ex) {
+-            Logger.getLogger(CraftServer.class.getName()).log(Level.SEVERE, "Could not save " + getCommandsConfigFile(), ex);
+-        }
+     }
+ 
+     public void loadPlugins() {
+diff --git a/src/main/resources/configurations/commands.yml b/src/main/resources/configurations/commands.yml
+index 733307c28..c6ff19c19 100644
+--- a/src/main/resources/configurations/commands.yml
++++ b/src/main/resources/configurations/commands.yml
+@@ -11,6 +11,4 @@
+ # Bug tracker: http://www.spigotmc.org/go/bugs
+ 
+ command-block-overrides: []
+-aliases:
+-    icanhasbukkit:
+-      - "version $1-"
++aliases: {}
+-- 
+2.47.3
+

@@ -1,0 +1,37 @@
+From a24f1381c62db5196aa35718f646dee7c1909a8c Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Sun, 15 Nov 2026 23:21:20 +0000
+Subject: [PATCH] Remove arrow and hook trajectory randomness
+
+
+diff --git a/src/main/java/net/minecraft/server/EntityArrow.java b/src/main/java/net/minecraft/server/EntityArrow.java
+index eac0363c2..e94a4859b 100644
+--- a/src/main/java/net/minecraft/server/EntityArrow.java
++++ b/src/main/java/net/minecraft/server/EntityArrow.java
+@@ -108,9 +108,6 @@ public class EntityArrow extends Entity implements IProjectile {
+         d0 /= (double) f2;
+         d1 /= (double) f2;
+         d2 /= (double) f2;
+-        d0 += this.random.nextGaussian() * (double) (this.random.nextBoolean() ? -1 : 1) * 0.007499999832361937D * (double) f1;
+-        d1 += this.random.nextGaussian() * (double) (this.random.nextBoolean() ? -1 : 1) * 0.007499999832361937D * (double) f1;
+-        d2 += this.random.nextGaussian() * (double) (this.random.nextBoolean() ? -1 : 1) * 0.007499999832361937D * (double) f1;
+         d0 *= (double) f;
+         d1 *= (double) f;
+         d2 *= (double) f;
+diff --git a/src/main/java/net/minecraft/server/EntityFishingHook.java b/src/main/java/net/minecraft/server/EntityFishingHook.java
+index df6ce0dbb..1ebd7dea6 100644
+--- a/src/main/java/net/minecraft/server/EntityFishingHook.java
++++ b/src/main/java/net/minecraft/server/EntityFishingHook.java
+@@ -72,9 +72,6 @@ public class EntityFishingHook extends Entity {
+         d0 /= (double) f2;
+         d1 /= (double) f2;
+         d2 /= (double) f2;
+-        d0 += this.random.nextGaussian() * 0.007499999832361937D * (double) f1;
+-        d1 += this.random.nextGaussian() * 0.007499999832361937D * (double) f1;
+-        d2 += this.random.nextGaussian() * 0.007499999832361937D * (double) f1;
+         d0 *= (double) f;
+         d1 *= (double) f;
+         d2 *= (double) f;
+-- 
+2.47.3
+

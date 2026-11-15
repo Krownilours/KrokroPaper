@@ -1,0 +1,98 @@
+From 56928319cff5e074d9fde2ee88c9f043ac0a3013 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Sun, 15 Nov 2026 14:17:33 +0000
+Subject: [PATCH] Customizable knockback
+
+
+diff --git a/src/main/java/net/minecraft/server/EntityHuman.java b/src/main/java/net/minecraft/server/EntityHuman.java
+index 0ad4edb83..f4110c34d 100644
+--- a/src/main/java/net/minecraft/server/EntityHuman.java
++++ b/src/main/java/net/minecraft/server/EntityHuman.java
+@@ -20,6 +20,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
+ import org.bukkit.event.player.PlayerItemConsumeEvent;
+ import org.bukkit.event.player.PlayerVelocityEvent;
+ import org.bukkit.util.Vector;
++import org.github.paperspigot.PaperSpigotConfig;
+ // CraftBukkit end
+ 
+ public abstract class EntityHuman extends EntityLiving {
+@@ -1003,7 +1004,7 @@ public abstract class EntityHuman extends EntityLiving {
+ 
+                     if (flag2) {
+                         if (i > 0) {
+-                            entity.g((double) (-MathHelper.sin(this.yaw * 3.1415927F / 180.0F) * (float) i * 0.5F), 0.1D, (double) (MathHelper.cos(this.yaw * 3.1415927F / 180.0F) * (float) i * 0.5F));
++                            entity.g((double) (-MathHelper.sin(this.yaw * 3.1415927F / 180.0F) * (float) i * PaperSpigotConfig.knockbackExtraHorizontal), PaperSpigotConfig.knockbackExtraVertical, (double) (MathHelper.cos(this.yaw * 3.1415927F / 180.0F) * (float) i * PaperSpigotConfig.knockbackExtraHorizontal));
+                             this.motX *= 0.6D;
+                             this.motZ *= 0.6D;
+                             this.setSprinting(false);
+diff --git a/src/main/java/net/minecraft/server/EntityLiving.java b/src/main/java/net/minecraft/server/EntityLiving.java
+index c8b4e2928..1fcddb5de 100644
+--- a/src/main/java/net/minecraft/server/EntityLiving.java
++++ b/src/main/java/net/minecraft/server/EntityLiving.java
+@@ -22,6 +22,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageModifier;
+ import org.bukkit.event.entity.EntityRegainHealthEvent;
+ import org.bukkit.event.vehicle.VehicleExitEvent;
+ // CraftBukkit end
++import org.github.paperspigot.PaperSpigotConfig;
+ 
+ import co.aikar.timings.SpigotTimings; // Spigot
+ 
+@@ -897,17 +898,20 @@ public abstract class EntityLiving extends Entity {
+     public void a(Entity entity, float f, double d0, double d1) {
+         if (this.random.nextDouble() >= this.getAttributeInstance(GenericAttributes.c).getValue()) {
+             this.ai = true;
+-            float f1 = MathHelper.sqrt(d0 * d0 + d1 * d1);
+-            float f2 = 0.4F;
+-
+-            this.motX /= 2.0D;
+-            this.motY /= 2.0D;
+-            this.motZ /= 2.0D;
+-            this.motX -= d0 / (double) f1 * (double) f2;
+-            this.motY += (double) f2;
+-            this.motZ -= d1 / (double) f1 * (double) f2;
+-            if (this.motY > 0.4000000059604645D) {
+-                this.motY = 0.4000000059604645D;
++
++            double magnitude = MathHelper.sqrt(d0 * d0 + d1 * d1);
++            double friction = PaperSpigotConfig.knockbackFriction;
++            double horizontalKnockback = PaperSpigotConfig.knockbackHorizontal;
++            double verticalKnockback = PaperSpigotConfig.knockbackVertical;
++
++            this.motX /= friction;
++            this.motY /= friction;
++            this.motZ /= friction;
++            this.motX -= d0 / magnitude * horizontalKnockback;
++            this.motY += verticalKnockback;
++            this.motZ -= d1 / magnitude * horizontalKnockback;
++            if (this.motY > PaperSpigotConfig.knockbackVerticalLimit) {
++                this.motY = PaperSpigotConfig.knockbackVerticalLimit;
+             }
+ 
+         }
+diff --git a/src/main/java/org/github/paperspigot/PaperSpigotConfig.java b/src/main/java/org/github/paperspigot/PaperSpigotConfig.java
+index d6d9899e2..6168dce36 100644
+--- a/src/main/java/org/github/paperspigot/PaperSpigotConfig.java
++++ b/src/main/java/org/github/paperspigot/PaperSpigotConfig.java
+@@ -222,4 +222,19 @@ public class PaperSpigotConfig
+     {
+         warnForExcessiveVelocity = getBoolean("warnWhenSettingExcessiveVelocity", true);
+     }
++
++    public static double knockbackFriction;
++    public static double knockbackHorizontal;
++    public static double knockbackVertical;
++    public static double knockbackVerticalLimit;
++    public static double knockbackExtraHorizontal;
++    public static double knockbackExtraVertical;
++    private static void knockback() {
++        knockbackFriction = getDouble("knockback.friction", 2.0D);
++        knockbackHorizontal = getDouble("knockback.horizontal", 0.4D);
++        knockbackVertical = getDouble("knockback.vertical", 0.4D);
++        knockbackVerticalLimit = getDouble("knockback.vertical-limit", 0.4D);
++        knockbackExtraHorizontal = getDouble("knockback.extra-horizontal", 0.5D);
++        knockbackExtraVertical = getDouble("knockback.extra-vertical", 0.1D);
++    }
+ }
+-- 
+2.47.3
+

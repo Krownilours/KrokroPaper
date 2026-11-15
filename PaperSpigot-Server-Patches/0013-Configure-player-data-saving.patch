@@ -1,0 +1,44 @@
+From 171325c6427984a3cad6ca4a3d76178949ab30d8 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Sun, 15 Nov 2026 16:46:47 +0000
+Subject: [PATCH] Configure player data saving
+
+
+diff --git a/src/main/java/net/minecraft/server/WorldNBTStorage.java b/src/main/java/net/minecraft/server/WorldNBTStorage.java
+index b4056a28a..d0a15df01 100644
+--- a/src/main/java/net/minecraft/server/WorldNBTStorage.java
++++ b/src/main/java/net/minecraft/server/WorldNBTStorage.java
+@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
+ import java.util.UUID;
+ 
+ import org.bukkit.craftbukkit.entity.CraftPlayer;
++import org.github.paperspigot.PaperSpigotConfig;
+ import org.github.paperspigot.exception.ServerInternalException;
+ // CraftBukkit end
+ 
+@@ -181,6 +182,7 @@ public class WorldNBTStorage implements IDataManager, IPlayerFileData {
+     }
+ 
+     public void save(EntityHuman entityhuman) {
++        if(!PaperSpigotConfig.savePlayerData) return;
+         try {
+             NBTTagCompound nbttagcompound = new NBTTagCompound();
+ 
+diff --git a/src/main/java/org/github/paperspigot/PaperSpigotConfig.java b/src/main/java/org/github/paperspigot/PaperSpigotConfig.java
+index 6168dce36..712e2473d 100644
+--- a/src/main/java/org/github/paperspigot/PaperSpigotConfig.java
++++ b/src/main/java/org/github/paperspigot/PaperSpigotConfig.java
+@@ -237,4 +237,10 @@ public class PaperSpigotConfig
+         knockbackExtraHorizontal = getDouble("knockback.extra-horizontal", 0.5D);
+         knockbackExtraVertical = getDouble("knockback.extra-vertical", 0.1D);
+     }
++
++    public static boolean savePlayerData = true;
++    private static void savePlayerData()
++    {
++        savePlayerData = getBoolean("settings.save-player-data", savePlayerData);
++    }
+ }
+-- 
+2.47.3
+

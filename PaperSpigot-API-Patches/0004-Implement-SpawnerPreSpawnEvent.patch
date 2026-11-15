@@ -1,0 +1,66 @@
+From e6a5676c13ec3062ec588dc0de692fe8a6d30e36 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Sun, 15 Nov 2026 15:13:08 +0000
+Subject: [PATCH] Implement SpawnerPreSpawnEvent
+
+
+diff --git a/src/main/java/org/github/paperspigot/event/spawner/SpawnerPreSpawnEvent.java b/src/main/java/org/github/paperspigot/event/spawner/SpawnerPreSpawnEvent.java
+new file mode 100644
+index 00000000..17f1be1c
+--- /dev/null
++++ b/src/main/java/org/github/paperspigot/event/spawner/SpawnerPreSpawnEvent.java
+@@ -0,0 +1,51 @@
++package org.github.paperspigot.event.spawner;
++
++import static com.google.common.base.Preconditions.checkNotNull;
++
++import org.bukkit.Location;
++import org.bukkit.entity.EntityType;
++import org.bukkit.event.Cancellable;
++import org.bukkit.event.Event;
++import org.bukkit.event.HandlerList;
++
++public class SpawnerPreSpawnEvent extends Event implements Cancellable {
++
++    private final Location location;
++    private final EntityType spawnedType;
++
++    public SpawnerPreSpawnEvent(Location location, EntityType spawnedType) {
++        this.location = checkNotNull(location, "Null location");
++        this.spawnedType = checkNotNull(spawnedType, "Null spawned type");
++    }
++
++    public Location getLocation() {
++        return location;
++    }
++
++    public EntityType getSpawnedType() {
++        return spawnedType;
++    }
++
++    private boolean cancelled;
++
++    @Override
++    public boolean isCancelled() {
++        return cancelled;
++    }
++
++    @Override
++    public void setCancelled(boolean cancel) {
++        this.cancelled = cancel;
++    }
++
++    private static final HandlerList handlerList = new HandlerList();
++
++    @Override
++    public HandlerList getHandlers() {
++        return handlerList;
++    }
++
++    public static HandlerList getHandlerList() {
++        return handlerList;
++    }
++}
+-- 
+2.47.3
+

@@ -1,0 +1,41 @@
+From 4eacf53014290f133e7b22cd65e7058a8f0c2894 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Sun, 15 Nov 2026 15:12:33 +0000
+Subject: [PATCH] Implement SpawnerPreSpawnEvent
+
+
+diff --git a/src/main/java/net/minecraft/server/MobSpawnerAbstract.java b/src/main/java/net/minecraft/server/MobSpawnerAbstract.java
+index d4674dcdf..a025966da 100644
+--- a/src/main/java/net/minecraft/server/MobSpawnerAbstract.java
++++ b/src/main/java/net/minecraft/server/MobSpawnerAbstract.java
+@@ -4,10 +4,13 @@ import com.google.common.collect.Lists;
+ import java.util.Iterator;
+ import java.util.List;
+ 
++import org.bukkit.Location;
+ // CraftBukkit start
+ import org.bukkit.craftbukkit.event.CraftEventFactory;
++import org.bukkit.entity.EntityType;
+ import org.bukkit.event.entity.CreatureSpawnEvent;
+ import org.bukkit.event.entity.SpawnerSpawnEvent;
++import org.github.paperspigot.event.spawner.SpawnerPreSpawnEvent;
+ // CraftBukkit end
+ 
+ public abstract class MobSpawnerAbstract {
+@@ -91,6 +94,13 @@ public abstract class MobSpawnerAbstract {
+                 boolean flag = false;
+ 
+                 for (int i = 0; i < this.spawnCount; ++i) {
++                    SpawnerPreSpawnEvent event = new SpawnerPreSpawnEvent(new Location(this.a().getWorld(), blockposition.getX(), blockposition.getY(), blockposition.getZ()), EntityType.fromName(this.getMobName()));
++                    this.a().getServer().getPluginManager().callEvent(event);
++
++                    if (event.isCancelled()) {
++                        flag = true;
++                        break;
++                    }
+                     Entity entity = EntityTypes.createEntityByName(this.getMobName(), this.a());
+ 
+                     if (entity == null) {
+-- 
+2.47.3
+

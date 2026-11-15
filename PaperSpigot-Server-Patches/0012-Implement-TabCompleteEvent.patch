@@ -1,0 +1,51 @@
+From 26e43cb0bf578ebeadabe9da9fff27c6a1a65347 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Sun, 15 Nov 2026 16:26:13 +0000
+Subject: [PATCH] Implement TabCompleteEvent
+
+
+diff --git a/src/main/java/net/minecraft/server/PlayerConnection.java b/src/main/java/net/minecraft/server/PlayerConnection.java
+index 4391ad7e7..2a2b02163 100644
+--- a/src/main/java/net/minecraft/server/PlayerConnection.java
++++ b/src/main/java/net/minecraft/server/PlayerConnection.java
+@@ -57,6 +57,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
+ import org.bukkit.event.player.PlayerToggleFlightEvent;
+ import org.bukkit.event.player.PlayerToggleSneakEvent;
+ import org.bukkit.event.player.PlayerToggleSprintEvent;
++import org.bukkit.event.server.TabCompleteEvent;
+ import org.bukkit.inventory.CraftingInventory;
+ import org.bukkit.inventory.InventoryView;
+ import org.bukkit.util.NumberConversions;
+@@ -1951,16 +1952,23 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
+             return;
+         }
+         // CraftBukkit end
+-        ArrayList arraylist = Lists.newArrayList();
+-        Iterator iterator = this.minecraftServer.tabCompleteCommand(this.player, packetplayintabcomplete.a(), packetplayintabcomplete.b()).iterator();
+ 
+-        while (iterator.hasNext()) {
+-            String s = (String) iterator.next();
++        String buffer = packetplayintabcomplete.a();
+ 
+-            arraylist.add(s);
++        if(buffer == null || buffer.isEmpty()) {
++            return;
++        }
++
++        List<String> list = new ArrayList<String>(this.minecraftServer.tabCompleteCommand(this.player, buffer, packetplayintabcomplete.b()));
++        TabCompleteEvent event = new TabCompleteEvent(this.player.getBukkitEntity(), buffer, list);
++
++        this.player.world.getServer().getPluginManager().callEvent(event);
++
++        if(event.isCancelled()) {
++            return;
+         }
+ 
+-        this.player.playerConnection.sendPacket(new PacketPlayOutTabComplete((String[]) arraylist.toArray(new String[arraylist.size()])));
++        this.player.playerConnection.sendPacket(new PacketPlayOutTabComplete(list.toArray(new String[list.size()])));
+     }
+ 
+     public void a(PacketPlayInSettings packetplayinsettings) {
+-- 
+2.47.3
+

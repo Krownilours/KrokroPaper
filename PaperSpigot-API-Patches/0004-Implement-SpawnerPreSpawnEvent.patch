@@ -1,4 +1,4 @@
-From e6a5676c13ec3062ec588dc0de692fe8a6d30e36 Mon Sep 17 00:00:00 2001
+From b03c76ee7ef400604c609b1a85e57406862002de Mon Sep 17 00:00:00 2001
 From: Krownilours <im4kingfr@gmail.com>
 Date: Sun, 15 Nov 2026 15:13:08 +0000
 Subject: [PATCH] Implement SpawnerPreSpawnEvent
@@ -6,7 +6,7 @@ Subject: [PATCH] Implement SpawnerPreSpawnEvent
 
 diff --git a/src/main/java/org/github/paperspigot/event/spawner/SpawnerPreSpawnEvent.java b/src/main/java/org/github/paperspigot/event/spawner/SpawnerPreSpawnEvent.java
 new file mode 100644
-index 00000000..17f1be1c
+index 00000000..be227859
 --- /dev/null
 +++ b/src/main/java/org/github/paperspigot/event/spawner/SpawnerPreSpawnEvent.java
 @@ -0,0 +1,51 @@

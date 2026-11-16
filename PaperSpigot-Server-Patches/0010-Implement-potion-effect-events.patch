@@ -1,4 +1,4 @@
-From 711dc21a7c2dc5718202cd1528190f6b9db1e2d4 Mon Sep 17 00:00:00 2001
+From c683330cc4a59c8ff4f45b4c0fc7849a79372b34 Mon Sep 17 00:00:00 2001
 From: Krownilours <im4kingfr@gmail.com>
 Date: Sun, 15 Nov 2026 14:36:30 +0000
 Subject: [PATCH] Implement potion effect events
@@ -69,7 +69,7 @@ index 1fcddb5de..4018ae49f 100644
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionUtils.java b/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionUtils.java
 new file mode 100644
-index 000000000..fa0708ab1
+index 000000000..bd5c62a7e
 --- /dev/null
 +++ b/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionUtils.java
 @@ -0,0 +1,28 @@

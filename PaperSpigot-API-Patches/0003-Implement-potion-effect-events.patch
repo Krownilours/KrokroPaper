@@ -1,4 +1,4 @@
-From 2e75a69d7e525ce1f74384963e319bb770a17ec0 Mon Sep 17 00:00:00 2001
+From 5d9ec8cd97cae62a490b5e44ae0962317bddae50 Mon Sep 17 00:00:00 2001
 From: Krownilours <im4kingfr@gmail.com>
 Date: Sun, 15 Nov 2026 14:36:45 +0000
 Subject: [PATCH] Implement potion effect events
@@ -6,7 +6,7 @@ Subject: [PATCH] Implement potion effect events
 
 diff --git a/src/main/java/org/bukkit/event/entity/PotionEffectAddEvent.java b/src/main/java/org/bukkit/event/entity/PotionEffectAddEvent.java
 new file mode 100644
-index 00000000..4fea339a
+index 00000000..183e6f85
 --- /dev/null
 +++ b/src/main/java/org/bukkit/event/entity/PotionEffectAddEvent.java
 @@ -0,0 +1,36 @@
@@ -48,7 +48,7 @@ index 00000000..4fea339a
 +}
 diff --git a/src/main/java/org/bukkit/event/entity/PotionEffectEvent.java b/src/main/java/org/bukkit/event/entity/PotionEffectEvent.java
 new file mode 100644
-index 00000000..117c8190
+index 00000000..3e236b0e
 --- /dev/null
 +++ b/src/main/java/org/bukkit/event/entity/PotionEffectEvent.java
 @@ -0,0 +1,23 @@
@@ -77,7 +77,7 @@ index 00000000..117c8190
 +}
 diff --git a/src/main/java/org/bukkit/event/entity/PotionEffectExpireEvent.java b/src/main/java/org/bukkit/event/entity/PotionEffectExpireEvent.java
 new file mode 100644
-index 00000000..77fd3a82
+index 00000000..57dd953f
 --- /dev/null
 +++ b/src/main/java/org/bukkit/event/entity/PotionEffectExpireEvent.java
 @@ -0,0 +1,31 @@
@@ -114,7 +114,7 @@ index 00000000..77fd3a82
 +}
 diff --git a/src/main/java/org/bukkit/event/entity/PotionEffectExtendEvent.java b/src/main/java/org/bukkit/event/entity/PotionEffectExtendEvent.java
 new file mode 100644
-index 00000000..bf8ef6ac
+index 00000000..d3d1a762
 --- /dev/null
 +++ b/src/main/java/org/bukkit/event/entity/PotionEffectExtendEvent.java
 @@ -0,0 +1,18 @@
@@ -138,7 +138,7 @@ index 00000000..bf8ef6ac
 +}
 diff --git a/src/main/java/org/bukkit/event/entity/PotionEffectRemoveEvent.java b/src/main/java/org/bukkit/event/entity/PotionEffectRemoveEvent.java
 new file mode 100644
-index 00000000..cf406eef
+index 00000000..9045092e
 --- /dev/null
 +++ b/src/main/java/org/bukkit/event/entity/PotionEffectRemoveEvent.java
 @@ -0,0 +1,36 @@

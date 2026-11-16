@@ -1,4 +1,4 @@
-From f527b4b5468964915328fafce269aabc2991ddc4 Mon Sep 17 00:00:00 2001
+From 63205d88780da99f2a870c569d823fac02d77e6b Mon Sep 17 00:00:00 2001
 From: Krownilours <im4kingfr@gmail.com>
 Date: Sun, 15 Nov 2026 16:26:32 +0000
 Subject: [PATCH] Implement TabCompleteEvent
@@ -6,7 +6,7 @@ Subject: [PATCH] Implement TabCompleteEvent
 
 diff --git a/src/main/java/org/bukkit/event/server/TabCompleteEvent.java b/src/main/java/org/bukkit/event/server/TabCompleteEvent.java
 new file mode 100644
-index 00000000..47d27bb1
+index 00000000..8159af54
 --- /dev/null
 +++ b/src/main/java/org/bukkit/event/server/TabCompleteEvent.java
 @@ -0,0 +1,59 @@

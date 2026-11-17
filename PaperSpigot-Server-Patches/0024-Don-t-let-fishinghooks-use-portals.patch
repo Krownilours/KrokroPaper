@@ -1,0 +1,24 @@
+From c06667b572d658df7eed3038edb195963bf48552 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Tue, 17 Nov 2026 20:02:22 +0000
+Subject: [PATCH] Don't let fishinghooks use portals
+
+
+diff --git a/src/main/java/net/minecraft/server/EntityFishingHook.java b/src/main/java/net/minecraft/server/EntityFishingHook.java
+index 1ebd7dea6..8f2c8a906 100644
+--- a/src/main/java/net/minecraft/server/EntityFishingHook.java
++++ b/src/main/java/net/minecraft/server/EntityFishingHook.java
+@@ -357,6 +357,10 @@ public class EntityFishingHook extends Entity {
+                 this.motY *= (double) f2;
+                 this.motZ *= (double) f2;
+                 this.setPosition(this.locX, this.locY, this.locZ);
++
++                if(this.ak) {
++                    this.die();
++                }
+             }
+         }
+     }
+-- 
+2.47.3
+

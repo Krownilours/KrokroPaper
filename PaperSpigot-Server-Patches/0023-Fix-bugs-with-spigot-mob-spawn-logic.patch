@@ -1,0 +1,44 @@
+From c5a387ce4487e0ec532efc4b3250ad8137f82435 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Tue, 17 Nov 2026 19:58:38 +0000
+Subject: [PATCH] Fix bugs with spigot mob spawn logic
+
+
+diff --git a/src/main/java/net/minecraft/server/Chunk.java b/src/main/java/net/minecraft/server/Chunk.java
+index 3da0854a1..97777d1f3 100644
+--- a/src/main/java/net/minecraft/server/Chunk.java
++++ b/src/main/java/net/minecraft/server/Chunk.java
+@@ -782,6 +782,7 @@ public class Chunk {
+         }
+ 
+         this.entitySlices[i].remove(entity);
++        if (!this.entitySlices[i].remove(entity)) { return; }
+         // PaperSpigot start - update counts
+         if (entity instanceof EntityItem) {
+             itemCounts[i]--;
+diff --git a/src/main/java/net/minecraft/server/SpawnerCreature.java b/src/main/java/net/minecraft/server/SpawnerCreature.java
+index 284f4bf2f..5135e9303 100644
+--- a/src/main/java/net/minecraft/server/SpawnerCreature.java
++++ b/src/main/java/net/minecraft/server/SpawnerCreature.java
+@@ -23,6 +23,9 @@ public final class SpawnerCreature {
+     // Spigot start - get entity count only from chunks being processed in b
+     private int getEntityCount(WorldServer server, Class oClass)
+     {
++        if (true) {
++            return server.chunkProviderServer.chunks.values().stream().collect(java.util.stream.Collectors.summingInt(c -> c.entityCount.get(oClass)));
++        }
+         int i = 0;
+         Iterator<Long> it = this.b.iterator();
+         while ( it.hasNext() )
+@@ -119,7 +122,7 @@ public final class SpawnerCreature {
+                     k = worldserver.a(enumcreaturetype.a());
+                     int l1 = limit * i / a; // CraftBukkit - use per-world limits
+ 
+-                    if ((mobcnt = getEntityCount(worldserver, enumcreaturetype.a())) <= limit * i / 256) {
++                    if ((mobcnt = getEntityCount(worldserver, enumcreaturetype.a())) <= limit * i / 289) {
+                         Iterator iterator1 = this.b.iterator();
+ 
+                         int moblimit = (limit * i / 256) - mobcnt + 1; // Spigot - up to 1 more than limit
+-- 
+2.47.3
+

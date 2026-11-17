@@ -1,0 +1,22 @@
+From dd2a3580b52ac4bc49e974e10631d8dc8e317741 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Tue, 17 Nov 2026 17:32:34 +0000
+Subject: [PATCH] Fix blocking damage multiplier
+
+
+diff --git a/src/main/java/net/minecraft/server/EntityLiving.java b/src/main/java/net/minecraft/server/EntityLiving.java
+index b57f0ba7e..7fecad186 100644
+--- a/src/main/java/net/minecraft/server/EntityLiving.java
++++ b/src/main/java/net/minecraft/server/EntityLiving.java
+@@ -1093,7 +1093,7 @@ public abstract class EntityLiving extends Entity {
+                 public Double apply(Double f) {
+                     if (human) {
+                         if (!damagesource.ignoresArmor() && ((EntityHuman) EntityLiving.this).isBlocking() && f > 0.0F) {
+-                            return -(f - ((1.0F + f) * 0.5F));
++                            return -(f - ((1.0F + f) * world.paperSpigotConfig.playerBlockingDamageMultiplier));
+                         }
+                     }
+                     return -0.0;
+-- 
+2.47.3
+

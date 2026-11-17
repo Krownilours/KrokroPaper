@@ -1,0 +1,59 @@
+From c210f2ce8b12c0e262791973fd33d520ad64730d Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Tue, 17 Nov 2026 15:41:34 +0000
+Subject: [PATCH] Handle NaN health/absorb values and repair bad data
+
+
+diff --git a/src/main/java/net/minecraft/server/EntityLiving.java b/src/main/java/net/minecraft/server/EntityLiving.java
+index 4018ae49f..b57f0ba7e 100644
+--- a/src/main/java/net/minecraft/server/EntityLiving.java
++++ b/src/main/java/net/minecraft/server/EntityLiving.java
+@@ -422,7 +422,11 @@ public abstract class EntityLiving extends Entity {
+     }
+ 
+     public void a(NBTTagCompound nbttagcompound) {
+-        this.setAbsorptionHearts(nbttagcompound.getFloat("AbsorptionAmount"));
++        float absorptionAmount = nbttagcompound.getFloat("AbsorptionAmount");
++        if (Float.isNaN(absorptionAmount)) {
++            absorptionAmount = 0;
++        }
++        this.setAbsorptionHearts(absorptionAmount);
+         if (nbttagcompound.hasKeyOfType("Attributes", 9) && this.world != null && !this.world.isClientSide) {
+             GenericAttributes.a(this.getAttributeMap(), nbttagcompound.getList("Attributes", 10));
+         }
+@@ -713,6 +717,9 @@ public abstract class EntityLiving extends Entity {
+     }
+ 
+     public void setHealth(float f) {
++        if (Float.isNaN(f)) {
++            f = getMaxHealth();
++        }
+         // CraftBukkit start - Handle scaled health
+         if (this instanceof EntityPlayer) {
+             org.bukkit.craftbukkit.entity.CraftPlayer player = ((EntityPlayer) this).getBukkitEntity();
+@@ -1843,7 +1850,7 @@ public abstract class EntityLiving extends Entity {
+     }
+ 
+     public void setAbsorptionHearts(float f) {
+-        if (f < 0.0F) {
++        if (f < 0.0F || Float.isNaN(f)) {
+             f = 0.0F;
+         }
+ 
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+index d44fc62b9..75c2afbc5 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -1378,6 +1378,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+     }
+ 
+     public void setRealHealth(double health) {
++        if (Double.isNaN(health)) {
++            return;
++        }
+         this.health = health;
+     }
+ 
+-- 
+2.47.3
+

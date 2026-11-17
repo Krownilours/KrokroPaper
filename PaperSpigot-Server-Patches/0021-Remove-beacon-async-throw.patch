@@ -1,0 +1,52 @@
+From 57c4044274af71116642dbf963b657057b9ae409 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Tue, 17 Nov 2026 19:40:35 +0000
+Subject: [PATCH] Remove beacon async throw
+
+
+diff --git a/src/main/java/net/minecraft/server/BlockBeacon.java b/src/main/java/net/minecraft/server/BlockBeacon.java
+index a73d7b13a..015656418 100644
+--- a/src/main/java/net/minecraft/server/BlockBeacon.java
++++ b/src/main/java/net/minecraft/server/BlockBeacon.java
+@@ -62,8 +62,10 @@ public class BlockBeacon extends BlockContainer {
+     }
+ 
+     public static void f(final World world, final BlockPosition blockposition) {
++        /*
+         HttpUtilities.a.submit(new Runnable() {
+             public void run() {
++        */ // Paper
+                 Chunk chunk = world.getChunkAtWorldCoords(blockposition);
+ 
+                 for (int i = blockposition.getY() - 1; i >= 0; --i) {
+@@ -76,8 +78,10 @@ public class BlockBeacon extends BlockContainer {
+                     IBlockData iblockdata = world.getType(blockposition1);
+ 
+                     if (iblockdata.getBlock() == Blocks.BEACON) {
++                        /*
+                         ((WorldServer) world).postToMainThread(new Runnable() {
+                             public void run() {
++                            */ // Paper
+                                 TileEntity tileentity = world.getTileEntity(blockposition);
+ 
+                                 if (tileentity instanceof TileEntityBeacon) {
+@@ -85,12 +89,16 @@ public class BlockBeacon extends BlockContainer {
+                                     world.playBlockAction(blockposition, Blocks.BEACON, 1, 0);
+                                 }
+ 
++                                /*
+                             }
+                         });
++                        */ // Paper
+                     }
+                 }
+ 
++                /*
+             }
+         });
++        */ // Paper
+     }
+ }
+-- 
+2.47.3
+

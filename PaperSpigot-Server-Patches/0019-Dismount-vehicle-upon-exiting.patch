@@ -1,0 +1,21 @@
+From 1c9af45160058eb1d5af308da6ba5f874e9f9037 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Tue, 17 Nov 2026 16:17:17 +0000
+Subject: [PATCH] Dismount vehicle upon exiting
+
+
+diff --git a/src/main/java/net/minecraft/server/PlayerList.java b/src/main/java/net/minecraft/server/PlayerList.java
+index 3c2d3197f..d615217ae 100644
+--- a/src/main/java/net/minecraft/server/PlayerList.java
++++ b/src/main/java/net/minecraft/server/PlayerList.java
+@@ -355,6 +355,7 @@ public abstract class PlayerList {
+     }
+ 
+     public String disconnect(EntityPlayer entityplayer) { // CraftBukkit - return string
++        entityplayer.mount(null);
+         entityplayer.b(StatisticList.f);
+ 
+         // CraftBukkit start - Quitting must be before we do final save of data, in case plugins need to modify it
+-- 
+2.47.3
+

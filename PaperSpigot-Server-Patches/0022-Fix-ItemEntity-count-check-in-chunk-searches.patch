@@ -1,0 +1,22 @@
+From 4db8cea1522852d9e1e5f36857799fb4b6efeda6 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Tue, 17 Nov 2026 19:43:20 +0000
+Subject: [PATCH] Fix ItemEntity count check in chunk searches
+
+
+diff --git a/src/main/java/net/minecraft/server/Chunk.java b/src/main/java/net/minecraft/server/Chunk.java
+index ab0d41cad..3da0854a1 100644
+--- a/src/main/java/net/minecraft/server/Chunk.java
++++ b/src/main/java/net/minecraft/server/Chunk.java
+@@ -1025,7 +1025,7 @@ public class Chunk {
+ 
+         // PaperSpigot start
+         int[] counts;
+-        if (ItemStack.class.isAssignableFrom(oclass)) {
++        if (EntityItem.class.isAssignableFrom(oclass)) {
+             counts = itemCounts;
+         } else if (IInventory.class.isAssignableFrom(oclass)) {
+             counts = inventoryEntityCounts;
+-- 
+2.47.3
+

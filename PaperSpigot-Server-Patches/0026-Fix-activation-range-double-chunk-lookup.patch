@@ -1,0 +1,26 @@
+From 81fdd6319158e6763f5c1d531c002d5e7d8029a5 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Wed, 18 Nov 2026 12:39:44 +0000
+Subject: [PATCH] Fix activation range double chunk lookup
+
+
+diff --git a/src/main/java/org/spigotmc/ActivationRange.java b/src/main/java/org/spigotmc/ActivationRange.java
+index d3767d2a8..b1a188d7c 100644
+--- a/src/main/java/org/spigotmc/ActivationRange.java
++++ b/src/main/java/org/spigotmc/ActivationRange.java
+@@ -128,9 +128,10 @@ public class ActivationRange
+             {
+                 for ( int j1 = k; j1 <= l; ++j1 )
+                 {
+-                    if ( world.getWorld().isChunkLoaded( i1, j1 ) )
++                    Chunk chunk = world.getChunkIfLoaded( i1, j1 );
++                    if ( chunk != null )
+                     {
+-                        activateChunkEntities( world.getChunkAt( i1, j1 ) );
++                        activateChunkEntities( chunk );
+                     }
+                 }
+             }
+-- 
+2.47.3
+

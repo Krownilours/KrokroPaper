@@ -1,0 +1,36 @@
+From c5fa3ec3ffe41c191ba4e6e5a14c79f851890c3c Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Wed, 18 Nov 2026 12:35:25 +0000
+Subject: [PATCH] Smooth teleportation
+
+
+diff --git a/src/main/java/net/minecraft/server/PlayerConnection.java b/src/main/java/net/minecraft/server/PlayerConnection.java
+index 197acf408..abc5fff07 100644
+--- a/src/main/java/net/minecraft/server/PlayerConnection.java
++++ b/src/main/java/net/minecraft/server/PlayerConnection.java
+@@ -275,7 +275,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
+ 
+                         // If the event is cancelled we move the player back to their old location.
+                         if (event.isCancelled()) {
+-                            this.player.playerConnection.sendPacket(new PacketPlayOutPosition(from.getX(), from.getY(), from.getZ(), from.getYaw(), from.getPitch(), Collections.<PacketPlayOutPosition.EnumPlayerTeleportFlags>emptySet()));
++                            this.player.playerConnection.sendPacket(new PacketPlayOutPosition(from.getX(), from.getY(), from.getZ(), 0, 0, com.google.common.collect.Sets.immutableEnumSet(PacketPlayOutPosition.EnumPlayerTeleportFlags.X_ROT,PacketPlayOutPosition.EnumPlayerTeleportFlags.Y_ROT)));
+                             return;
+                         }
+ 
+@@ -519,6 +519,13 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
+     }
+ 
+     private void internalTeleport(double d0, double d1, double d2, float f, float f1, Set set) {
++        if (set.isEmpty()) {
++            if (this.player.yaw == f && this.player.pitch == f1) {
++                set = com.google.common.collect.Sets.immutableEnumSet(PacketPlayOutPosition.EnumPlayerTeleportFlags.X_ROT, PacketPlayOutPosition.EnumPlayerTeleportFlags.Y_ROT);;
++                f = 0;
++                f1 = 0;
++            }
++        }
+         if (Float.isNaN(f)) {
+             f = 0;
+         }
+-- 
+2.47.3
+

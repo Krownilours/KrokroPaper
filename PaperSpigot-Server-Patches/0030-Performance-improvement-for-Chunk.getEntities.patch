@@ -1,0 +1,29 @@
+From 7c144c7e885d4aba74a6c71c46a0bbdcde185613 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Wed, 18 Nov 2026 13:07:38 +0000
+Subject: [PATCH] Performance improvement for Chunk.getEntities
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
+index 8a33e282c..53bad74df 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
+@@ -87,12 +87,12 @@ public class CraftChunk implements Chunk {
+ 
+         for (int i = 0; i < 16; i++) {
+ 
+-            for (Object obj : chunk.entitySlices[i].toArray()) {
+-                if (!(obj instanceof net.minecraft.server.Entity)) {
++            for (net.minecraft.server.Entity entity : chunk.entitySlices[i]) {
++                if (entity == null) {
+                     continue;
+                 }
+ 
+-                entities[index++] = ((net.minecraft.server.Entity) obj).getBukkitEntity();
++                entities[index++] = entity.getBukkitEntity();
+             }
+         }
+ 
+-- 
+2.47.3
+

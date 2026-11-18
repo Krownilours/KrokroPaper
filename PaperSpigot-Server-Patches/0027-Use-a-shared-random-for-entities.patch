@@ -1,0 +1,50 @@
+From 547e61fe2d1b7b76ee93d2ce0978b0cac573ce54 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Wed, 18 Nov 2026 12:43:44 +0000
+Subject: [PATCH] Use a shared random for entities
+
+
+diff --git a/src/main/java/net/minecraft/server/Entity.java b/src/main/java/net/minecraft/server/Entity.java
+index 2da303fee..1e6fb9d49 100644
+--- a/src/main/java/net/minecraft/server/Entity.java
++++ b/src/main/java/net/minecraft/server/Entity.java
+@@ -7,6 +7,7 @@ import java.util.UUID;
+ import java.util.concurrent.Callable;
+ 
+ // CraftBukkit start
++import org.apache.logging.log4j.LogManager;
+ import org.bukkit.Bukkit;
+ import org.bukkit.Location;
+ import org.bukkit.Server;
+@@ -41,6 +42,19 @@ public abstract class Entity implements ICommandListener {
+ 
+     // CraftBukkit start
+     private static final int CURRENT_LEVEL = 2;
++    public static Random SHARED_RANDOM = new Random() {
++        private boolean locked = false;
++        @Override
++        public synchronized void setSeed(long seed) {
++            if (locked) {
++                LogManager.getLogger().error("Ignoring setSeed on Entity.SHARED_RANDOM", new Throwable());
++            } else {
++                super.setSeed(seed);
++                locked = true;
++            }
++        }
++    };
++
+     static boolean isLevelAtLeast(NBTTagCompound tag, int level) {
+         return tag.hasKey("Bukkit.updateLevel") && tag.getInt("Bukkit.updateLevel") >= level;
+     }
+@@ -160,7 +174,7 @@ public abstract class Entity implements ICommandListener {
+         this.width = 0.6F;
+         this.length = 1.8F;
+         this.h = 1;
+-        this.random = new Random();
++        this.random = SHARED_RANDOM;
+         this.maxFireTicks = 1;
+         this.justCreated = true;
+         this.uniqueID = MathHelper.a(this.random);
+-- 
+2.47.3
+

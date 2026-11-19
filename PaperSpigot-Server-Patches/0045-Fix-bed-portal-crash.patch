@@ -1,0 +1,31 @@
+From 8bc056a84c519d6f2ebdc212ca60abf2623a5110 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Thu, 19 Nov 2026 19:15:52 +0100
+Subject: [PATCH] Fix bed portal crash
+
+
+diff --git a/src/main/java/net/minecraft/server/WorldServer.java b/src/main/java/net/minecraft/server/WorldServer.java
+index 09270b7d8..900af3604 100644
+--- a/src/main/java/net/minecraft/server/WorldServer.java
++++ b/src/main/java/net/minecraft/server/WorldServer.java
+@@ -310,14 +310,12 @@ public class WorldServer extends World implements IAsyncTaskHandler {
+ 
+     protected void e() {
+         this.O = false;
+-        Iterator iterator = this.players.iterator();
++        Iterator<EntityHuman> iterator = this.players.stream().filter(EntityHuman::isSleeping).iterator();
+ 
+         while (iterator.hasNext()) {
+-            EntityHuman entityhuman = (EntityHuman) iterator.next();
++            EntityHuman entityhuman = iterator.next();
+ 
+-            if (entityhuman.isSleeping()) {
+-                entityhuman.a(false, false, true);
+-            }
++            entityhuman.a(false, false, true);
+         }
+ 
+         this.ag();
+-- 
+2.39.5
+

@@ -1,0 +1,32 @@
+From 15a19c4875da753c25845fe792ee7b24aed651c1 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Thu, 19 Nov 2026 18:22:36 +0100
+Subject: [PATCH] Faster redstone torch rapid clock removal
+
+
+diff --git a/src/main/java/net/minecraft/server/BlockRedstoneTorch.java b/src/main/java/net/minecraft/server/BlockRedstoneTorch.java
+index 78c6d195a..3927a1897 100644
+--- a/src/main/java/net/minecraft/server/BlockRedstoneTorch.java
++++ b/src/main/java/net/minecraft/server/BlockRedstoneTorch.java
+@@ -116,9 +116,15 @@ public class BlockRedstoneTorch extends BlockTorch {
+         boolean flag = this.g(world, blockposition, iblockdata);
+         List list = (List) BlockRedstoneTorch.b.get(world);
+ 
+-        while (list != null && !list.isEmpty() && world.getTime() - ((BlockRedstoneTorch.RedstoneUpdateInfo) list.get(0)).b > 60L) {
+-            list.remove(0);
+-        }
++        if (list != null) {
++            int index = 0;
++            while (index < list.size() && world.getTime() - ((BlockRedstoneTorch.RedstoneUpdateInfo) list.get(index)).b > 60L) {
++                index++;
++            }
++            if (index > 0) {
++                list.subList(0, index).clear();
++            }
++         }
+ 
+         // CraftBukkit start
+         org.bukkit.plugin.PluginManager manager = world.getServer().getPluginManager();
+-- 
+2.39.5
+

@@ -1,0 +1,50 @@
+From 76e0a71b1bb102052d52751b5898962ae8f718b7 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Thu, 19 Nov 2026 15:30:51 +0100
+Subject: [PATCH] Optimize armor stands
+
+
+diff --git a/src/main/java/net/minecraft/server/EntityArmorStand.java b/src/main/java/net/minecraft/server/EntityArmorStand.java
+index 2ea4a5fd3..a65ce8018 100644
+--- a/src/main/java/net/minecraft/server/EntityArmorStand.java
++++ b/src/main/java/net/minecraft/server/EntityArmorStand.java
+@@ -705,4 +705,10 @@ public class EntityArmorStand extends EntityLiving {
+     public boolean ad() {
+         return super.ad() && !this.s();
+     }
++
++    @Override
++    public void move(double motX, double motY, double motZ) {
++        if (getWorld().paperSpigotConfig.optimizeArmorStandMovement) return;
++        super.move(motX, motY, motZ);
++    }
+ }
+diff --git a/src/main/java/net/minecraft/server/World.java b/src/main/java/net/minecraft/server/World.java
+index 8f3511f80..6c9e5d887 100644
+--- a/src/main/java/net/minecraft/server/World.java
++++ b/src/main/java/net/minecraft/server/World.java
+@@ -1230,6 +1230,7 @@ public abstract class World implements IBlockAccess {
+         // Spigot end
+ 
+         if (entity instanceof EntityItem) return arraylist; // PaperSpigot - Optimize item movement
++        if (entity instanceof EntityArmorStand) return arraylist;
+ 
+         double d0 = 0.25D;
+         List list = this.getEntities(entity, axisalignedbb.grow(d0, d0, d0));
+diff --git a/src/main/java/org/github/paperspigot/PaperSpigotWorldConfig.java b/src/main/java/org/github/paperspigot/PaperSpigotWorldConfig.java
+index 67e56df01..b60baa1f2 100644
+--- a/src/main/java/org/github/paperspigot/PaperSpigotWorldConfig.java
++++ b/src/main/java/org/github/paperspigot/PaperSpigotWorldConfig.java
+@@ -408,4 +408,9 @@ public class PaperSpigotWorldConfig
+     {
+         disableTeleportationSuffocationCheck = getBoolean("disable-teleportation-suffocation-check", false);
+     }
++
++    public boolean optimizeArmorStandMovement;
++    private void isArmorStandMoveWithoutGravity() {
++        optimizeArmorStandMovement = getBoolean("armor-stand.optimize-movement", false);
++    }
+ }
+-- 
+2.39.5
+

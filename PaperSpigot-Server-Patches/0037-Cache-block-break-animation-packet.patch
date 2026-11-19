@@ -1,0 +1,43 @@
+From 016426f161f161f4fc7a54e12c51f6050d93b1ae Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Thu, 19 Nov 2026 16:43:08 +0100
+Subject: [PATCH] Cache block break animation packet
+
+
+diff --git a/src/main/java/net/minecraft/server/WorldManager.java b/src/main/java/net/minecraft/server/WorldManager.java
+index 55a2112d2..96976a42c 100644
+--- a/src/main/java/net/minecraft/server/WorldManager.java
++++ b/src/main/java/net/minecraft/server/WorldManager.java
+@@ -53,7 +53,7 @@ public class WorldManager implements IWorldAccess {
+     }
+ 
+     public void b(int i, BlockPosition blockposition, int j) {
+-        Iterator iterator = this.a.getPlayerList().v().iterator();
++        Iterator<EntityPlayer> iterator = this.a.getPlayerList().v().iterator();
+ 
+         // CraftBukkit start
+         EntityHuman entityhuman = null;
+@@ -61,8 +61,9 @@ public class WorldManager implements IWorldAccess {
+         if (entity instanceof EntityHuman) entityhuman = (EntityHuman) entity;
+         // CraftBukkit end
+ 
++        PacketPlayOutBlockBreakAnimation packet = null;
+         while (iterator.hasNext()) {
+-            EntityPlayer entityplayer = (EntityPlayer) iterator.next();
++            EntityPlayer entityplayer = iterator.next();
+ 
+             if (entityplayer != null && entityplayer.world == this.world && entityplayer.getId() != i) {
+                 double d0 = (double) blockposition.getX() - entityplayer.locX;
+@@ -76,7 +77,8 @@ public class WorldManager implements IWorldAccess {
+                 // CraftBukkit end
+ 
+                 if (d0 * d0 + d1 * d1 + d2 * d2 < 1024.0D) {
+-                    entityplayer.playerConnection.sendPacket(new PacketPlayOutBlockBreakAnimation(i, blockposition, j));
++                    if (packet == null) packet = new PacketPlayOutBlockBreakAnimation(i, blockposition, j);
++                    entityplayer.playerConnection.sendPacket(packet);
+                 }
+             }
+         }
+-- 
+2.39.5
+

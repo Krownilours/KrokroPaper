@@ -1,0 +1,83 @@
+From 370549f77f7737de2cb9c029471c6aeed36e9e29 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Thu, 19 Nov 2026 18:36:01 +0100
+Subject: [PATCH] Fix east/west cannoning
+
+
+diff --git a/src/main/java/net/minecraft/server/Entity.java b/src/main/java/net/minecraft/server/Entity.java
+index fa9e2905a..a2d92b95d 100644
+--- a/src/main/java/net/minecraft/server/Entity.java
++++ b/src/main/java/net/minecraft/server/Entity.java
+@@ -548,24 +548,45 @@ public abstract class Entity implements ICommandListener {
+             this.a(this.getBoundingBox().c(0.0D, d1, 0.0D));
+             boolean flag1 = this.onGround || d7 != d1 && d7 < 0.0D;
+ 
+-            if(axisScan) list = this.world.getCubes(this, this.getBoundingBox().a(d0, 0, 0));
+-
+             AxisAlignedBB axisalignedbb2;
+             Iterator iterator1;
+ 
+-            for (iterator1 = list.iterator(); iterator1.hasNext(); d0 = axisalignedbb2.a(this.getBoundingBox(), d0)) {
+-                axisalignedbb2 = (AxisAlignedBB) iterator1.next();
+-            }
++            if(this.world.paperSpigotConfig.fixEastWest && Math.abs(d0) > Math.abs(d2)) {
++
++                if(axisScan) list = this.world.getCubes(this, this.getBoundingBox().a(0, 0, d2));
++
++                for (iterator1 = list.iterator(); iterator1.hasNext(); d2 = axisalignedbb2.c(this.getBoundingBox(), d2)) {
++                    axisalignedbb2 = (AxisAlignedBB) iterator1.next();
++                }
++
++                this.a(this.getBoundingBox().c(0.0D, 0.0D, d2));
++
++                if(axisScan) list = this.world.getCubes(this, this.getBoundingBox().a(d0, 0, 0));
++
++                for (iterator1 = list.iterator(); iterator1.hasNext(); d0 = axisalignedbb2.a(this.getBoundingBox(), d0)) {
++                    axisalignedbb2 = (AxisAlignedBB) iterator1.next();
++                }
++
++                this.a(this.getBoundingBox().c(d0, 0.0D, 0.0D));
++
++            } else {
++                if(axisScan) list = this.world.getCubes(this, this.getBoundingBox().a(d0, 0, 0));
+ 
+-            this.a(this.getBoundingBox().c(d0, 0.0D, 0.0D));
++                for (iterator1 = list.iterator(); iterator1.hasNext(); d0 = axisalignedbb2.a(this.getBoundingBox(), d0)) {
++                    axisalignedbb2 = (AxisAlignedBB) iterator1.next();
++                }
++
++                this.a(this.getBoundingBox().c(d0, 0.0D, 0.0D));
+ 
+-            if(axisScan) list = this.world.getCubes(this, this.getBoundingBox().a(0, 0, d2));
++                if(axisScan) list = this.world.getCubes(this, this.getBoundingBox().a(0, 0, d2));
++
++                for (iterator1 = list.iterator(); iterator1.hasNext(); d2 = axisalignedbb2.c(this.getBoundingBox(), d2)) {
++                    axisalignedbb2 = (AxisAlignedBB) iterator1.next();
++                }
+ 
+-            for (iterator1 = list.iterator(); iterator1.hasNext(); d2 = axisalignedbb2.c(this.getBoundingBox(), d2)) {
+-                axisalignedbb2 = (AxisAlignedBB) iterator1.next();
++                this.a(this.getBoundingBox().c(0.0D, 0.0D, d2));
+             }
+ 
+-            this.a(this.getBoundingBox().c(0.0D, 0.0D, d2));
+             if (this.S > 0.0F && flag1 && (d6 != d0 || d8 != d2)) {
+                 double d10 = d0;
+                 double d11 = d1;
+diff --git a/src/main/java/org/github/paperspigot/PaperSpigotWorldConfig.java b/src/main/java/org/github/paperspigot/PaperSpigotWorldConfig.java
+index 050079944..2107e0c09 100644
+--- a/src/main/java/org/github/paperspigot/PaperSpigotWorldConfig.java
++++ b/src/main/java/org/github/paperspigot/PaperSpigotWorldConfig.java
+@@ -423,4 +423,9 @@ public class PaperSpigotWorldConfig
+     private void isOptimizeLiquidExplosions() {
+         optimizeLiquidExplosions = getBoolean("tnt.optimize-liquid-explosions", true);
+     }
++
++    public boolean fixEastWest;
++    private void fixEastWest() {
++        fixEastWest = getBoolean("fix-east-west-cannoning", false);
++    }
+ }
+-- 
+2.39.5
+

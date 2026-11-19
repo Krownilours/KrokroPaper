@@ -1,0 +1,25 @@
+From 7e6d753d5df0a0919f9def7e05b8980a12ac8cf9 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Thu, 19 Nov 2026 19:10:34 +0100
+Subject: [PATCH] Prevent logins from being processed when the player has
+ disconnected
+
+
+diff --git a/src/main/java/net/minecraft/server/LoginListener.java b/src/main/java/net/minecraft/server/LoginListener.java
+index 541cec7cf..0b92c820f 100644
+--- a/src/main/java/net/minecraft/server/LoginListener.java
++++ b/src/main/java/net/minecraft/server/LoginListener.java
+@@ -51,7 +51,9 @@ public class LoginListener implements PacketLoginInListener, IUpdatePlayerListBo
+ 
+     public void c() {
+         if (this.g == LoginListener.EnumProtocolState.READY_TO_ACCEPT) {
+-            this.b();
++            if (networkManager.channel != null && networkManager.channel.isOpen()) {
++                this.b();
++            }
+         } else if (this.g == LoginListener.EnumProtocolState.e) {
+             EntityPlayer entityplayer = this.server.getPlayerList().a(this.i.getId());
+ 
+-- 
+2.39.5
+

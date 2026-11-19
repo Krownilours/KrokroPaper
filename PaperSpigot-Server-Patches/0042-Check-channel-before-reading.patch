@@ -1,0 +1,24 @@
+From d24b282cd645f8f4ce5cde86a44bed4c0de95df2 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Thu, 19 Nov 2026 19:08:41 +0100
+Subject: [PATCH] Check channel before reading
+
+
+diff --git a/src/main/java/net/minecraft/server/NetworkManager.java b/src/main/java/net/minecraft/server/NetworkManager.java
+index 9d23c6c0c..8ba3b7053 100644
+--- a/src/main/java/net/minecraft/server/NetworkManager.java
++++ b/src/main/java/net/minecraft/server/NetworkManager.java
+@@ -322,7 +322,9 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
+     }
+ 
+     protected void channelRead0(ChannelHandlerContext channelhandlercontext, Packet object) throws Exception { // CraftBukkit - fix decompile error
+-        this.a(channelhandlercontext, (Packet) object);
++        if (g()) {
++            this.a(channelhandlercontext, object);
++        }
+     }
+ 
+     static class QueuedPacket {
+-- 
+2.39.5
+

@@ -1,0 +1,125 @@
+From 0bd043a5d597a2f09c8b1a073716f6f307550697 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Thu, 19 Nov 2026 15:18:25 +0100
+Subject: [PATCH] Disable InventoryMoveItemEvent
+
+
+diff --git a/src/main/java/net/minecraft/server/BlockDropper.java b/src/main/java/net/minecraft/server/BlockDropper.java
+index f3e1e7230..5ef68c883 100644
+--- a/src/main/java/net/minecraft/server/BlockDropper.java
++++ b/src/main/java/net/minecraft/server/BlockDropper.java
+@@ -43,25 +43,9 @@ public class BlockDropper extends BlockDispenser {
+                             itemstack1 = null;
+                         }
+                     } else {
+-                        // CraftBukkit start - Fire event when pushing items into other inventories
+                         CraftItemStack oitemstack = CraftItemStack.asCraftMirror(itemstack.cloneItemStack().cloneAndSubtract(1));
+-
+-                        org.bukkit.inventory.Inventory destinationInventory;
+-                        // Have to special case large chests as they work oddly
+-                        if (iinventory instanceof InventoryLargeChest) {
+-                            destinationInventory = new org.bukkit.craftbukkit.inventory.CraftInventoryDoubleChest((InventoryLargeChest) iinventory);
+-                        } else {
+-                            destinationInventory = iinventory.getOwner().getInventory();
+-                        }
+-
+-                        InventoryMoveItemEvent event = new InventoryMoveItemEvent(tileentitydispenser.getOwner().getInventory(), oitemstack.clone(), destinationInventory, true);
+-                        world.getServer().getPluginManager().callEvent(event);
+-                        if (event.isCancelled()) {
+-                            return;
+-                        }
+-                        itemstack1 = TileEntityHopper.addItem(iinventory, CraftItemStack.asNMSCopy(event.getItem()), enumdirection.opposite());
+-                        if (event.getItem().equals(oitemstack) && itemstack1 == null) {
+-                            // CraftBukkit end
++                        itemstack1 = TileEntityHopper.addItem(iinventory, CraftItemStack.asNMSCopy(oitemstack), enumdirection.opposite());
++                        if (itemstack1 == null) {
+                             itemstack1 = itemstack.cloneItemStack();
+                             if (--itemstack1.count <= 0) {
+                                 itemstack1 = null;
+diff --git a/src/main/java/net/minecraft/server/TileEntityHopper.java b/src/main/java/net/minecraft/server/TileEntityHopper.java
+index 9a336765c..9a2b9df57 100644
+--- a/src/main/java/net/minecraft/server/TileEntityHopper.java
++++ b/src/main/java/net/minecraft/server/TileEntityHopper.java
+@@ -261,34 +261,12 @@ public class TileEntityHopper extends TileEntityContainer implements IHopper, IU
+                         ItemStack itemstack = this.getItem(i).cloneItemStack();
+                         // ItemStack itemstack1 = addItem(iinventory, this.splitStack(i, 1), enumdirection);
+ 
+-                        // CraftBukkit start - Call event when pushing items into other inventories
+                         CraftItemStack oitemstack = CraftItemStack.asCraftMirror(this.splitStack(i, world.spigotConfig.hopperAmount)); // Spigot
+-
+-                        Inventory destinationInventory;
+-                        // Have to special case large chests as they work oddly
+-                        if (iinventory instanceof InventoryLargeChest) {
+-                            destinationInventory = new org.bukkit.craftbukkit.inventory.CraftInventoryDoubleChest((InventoryLargeChest) iinventory);
+-                        } else {
+-                            destinationInventory = iinventory.getOwner().getInventory();
+-                        }
+-
+-                        InventoryMoveItemEvent event = new InventoryMoveItemEvent(this.getOwner().getInventory(), oitemstack.clone(), destinationInventory, true);
+-                        this.getWorld().getServer().getPluginManager().callEvent(event);
+-                        if (event.isCancelled()) {
+-                            this.setItem(i, itemstack);
+-                            this.d(world.spigotConfig.hopperTransfer); // Spigot
+-                            return false;
+-                        }
+-                        int origCount = event.getItem().getAmount(); // Spigot
+-                        ItemStack itemstack1 = addItem(iinventory, CraftItemStack.asNMSCopy(event.getItem()), enumdirection);
++                        int origCount = oitemstack.getAmount(); // Spigot
++                        ItemStack itemstack1 = addItem(iinventory, CraftItemStack.asNMSCopy(oitemstack), enumdirection);
+ 
+                         if (itemstack1 == null || itemstack1.count == 0) {
+-                            if (event.getItem().equals(oitemstack)) {
+-                                iinventory.update();
+-                            } else {
+-                                this.setItem(i, itemstack);
+-                            }
+-                            // CraftBukkit end
++                            iinventory.update();
+                             return true;
+                         }
+                         itemstack.count -= origCount - itemstack1.count; // Spigot
+@@ -412,38 +390,11 @@ public class TileEntityHopper extends TileEntityContainer implements IHopper, IU
+             // ItemStack itemstack2 = addItem(ihopper, iinventory.splitStack(i, 1), (EnumDirection) null);
+             // CraftBukkit start - Call event on collection of items from inventories into the hopper
+             CraftItemStack oitemstack = CraftItemStack.asCraftMirror(iinventory.splitStack(i, ihopper.getWorld().spigotConfig.hopperAmount)); // Spigot
+-
+-            Inventory sourceInventory;
+-            // Have to special case large chests as they work oddly
+-            if (iinventory instanceof InventoryLargeChest) {
+-                sourceInventory = new org.bukkit.craftbukkit.inventory.CraftInventoryDoubleChest((InventoryLargeChest) iinventory);
+-            } else {
+-                sourceInventory = iinventory.getOwner().getInventory();
+-            }
+-
+-            InventoryMoveItemEvent event = new InventoryMoveItemEvent(sourceInventory, oitemstack.clone(), ihopper.getOwner().getInventory(), false);
+-
+-            ihopper.getWorld().getServer().getPluginManager().callEvent(event);
+-            if (event.isCancelled()) {
+-                iinventory.setItem(i, itemstack1);
+-
+-                if (ihopper instanceof TileEntityHopper) {
+-                    ((TileEntityHopper) ihopper).d(ihopper.getWorld().spigotConfig.hopperTransfer); // Spigot
+-                } else if (ihopper instanceof EntityMinecartHopper) {
+-                    ((EntityMinecartHopper) ihopper).m(ihopper.getWorld().spigotConfig.hopperTransfer / 2); // Spigot
+-                }
+-                return false;
+-            }
+-            int origCount = event.getItem().getAmount(); // Spigot
+-            ItemStack itemstack2 = addItem(ihopper, CraftItemStack.asNMSCopy(event.getItem()), null);
++            int origCount = oitemstack.getAmount(); // Spigot
++            ItemStack itemstack2 = addItem(ihopper, CraftItemStack.asNMSCopy(oitemstack), null);
+ 
+             if (itemstack2 == null || itemstack2.count == 0) {
+-                if (event.getItem().equals(oitemstack)) {
+-                    iinventory.update();
+-                } else {
+-                    iinventory.setItem(i, itemstack1);
+-                }
+-                // CraftBukkit end
++                iinventory.update();
+                 return true;
+             }
+             itemstack1.count -= origCount - itemstack2.count; // Spigot
+-- 
+2.39.5
+

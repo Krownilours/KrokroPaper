@@ -1,0 +1,101 @@
+From 1761b5a76eecfc107dc5f042013e51cc3f6802fd Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Thu, 19 Nov 2026 15:57:10 +0100
+Subject: [PATCH] Optimize tnt entity and falling block movement
+
+
+diff --git a/src/main/java/net/minecraft/server/Entity.java b/src/main/java/net/minecraft/server/Entity.java
+index 1e6fb9d49..fa9e2905a 100644
+--- a/src/main/java/net/minecraft/server/Entity.java
++++ b/src/main/java/net/minecraft/server/Entity.java
+@@ -529,7 +529,14 @@ public abstract class Entity implements ICommandListener {
+                 }
+             }
+ 
+-            List list = this.world.getCubes(this, this.getBoundingBox().a(d0, d1, d2));
++            AxisAlignedBB totalArea = this.getBoundingBox().a(d0, d1, d2);
++            double xLength = totalArea.d - totalArea.a;
++            double yLength = totalArea.e - totalArea.b;
++            double zLength = totalArea.f - totalArea.c;
++            boolean axisScan = this.world.paperSpigotConfig.optimizeTntMovement && xLength * yLength * zLength > 10;
++
++            List list = this.world.getCubes(this, axisScan ? this.getBoundingBox().a(0, d1, 0) : totalArea);
++
+             AxisAlignedBB axisalignedbb = this.getBoundingBox();
+ 
+             AxisAlignedBB axisalignedbb1;
+@@ -541,6 +548,8 @@ public abstract class Entity implements ICommandListener {
+             this.a(this.getBoundingBox().c(0.0D, d1, 0.0D));
+             boolean flag1 = this.onGround || d7 != d1 && d7 < 0.0D;
+ 
++            if(axisScan) list = this.world.getCubes(this, this.getBoundingBox().a(d0, 0, 0));
++
+             AxisAlignedBB axisalignedbb2;
+             Iterator iterator1;
+ 
+@@ -550,6 +559,8 @@ public abstract class Entity implements ICommandListener {
+ 
+             this.a(this.getBoundingBox().c(d0, 0.0D, 0.0D));
+ 
++            if(axisScan) list = this.world.getCubes(this, this.getBoundingBox().a(0, 0, d2));
++
+             for (iterator1 = list.iterator(); iterator1.hasNext(); d2 = axisalignedbb2.c(this.getBoundingBox(), d2)) {
+                 axisalignedbb2 = (AxisAlignedBB) iterator1.next();
+             }
+diff --git a/src/main/java/net/minecraft/server/Explosion.java b/src/main/java/net/minecraft/server/Explosion.java
+index b7d410eeb..3a157bd8f 100644
+--- a/src/main/java/net/minecraft/server/Explosion.java
++++ b/src/main/java/net/minecraft/server/Explosion.java
+@@ -54,6 +54,9 @@ public class Explosion {
+         int i;
+         int j;
+ 
++        Block b = world.getChunkAt((int) posX >> 4, (int) posZ >> 4).getBlockData(new BlockPosition(posX, posY, posZ)).getBlock();
++
++        if (!this.world.paperSpigotConfig.optimizeLiquidExplosions || !b.getMaterial().isLiquid()) {
+         for (int k = 0; k < 16; ++k) {
+             for (i = 0; i < 16; ++i) {
+                 for (j = 0; j < 16; ++j) {
+@@ -93,6 +96,7 @@ public class Explosion {
+                 }
+             }
+         }
++        }
+ 
+         this.blocks.addAll(hashset);
+         float f3 = this.size * 2.0F;
+diff --git a/src/main/java/net/minecraft/server/World.java b/src/main/java/net/minecraft/server/World.java
+index 6c9e5d887..e14fd2a71 100644
+--- a/src/main/java/net/minecraft/server/World.java
++++ b/src/main/java/net/minecraft/server/World.java
+@@ -1231,6 +1231,8 @@ public abstract class World implements IBlockAccess {
+ 
+         if (entity instanceof EntityItem) return arraylist; // PaperSpigot - Optimize item movement
+         if (entity instanceof EntityArmorStand) return arraylist;
++        if (entity instanceof EntityTNTPrimed) return arraylist;
++        if (entity instanceof EntityFallingBlock) return arraylist;
+ 
+         double d0 = 0.25D;
+         List list = this.getEntities(entity, axisalignedbb.grow(d0, d0, d0));
+diff --git a/src/main/java/org/github/paperspigot/PaperSpigotWorldConfig.java b/src/main/java/org/github/paperspigot/PaperSpigotWorldConfig.java
+index b60baa1f2..050079944 100644
+--- a/src/main/java/org/github/paperspigot/PaperSpigotWorldConfig.java
++++ b/src/main/java/org/github/paperspigot/PaperSpigotWorldConfig.java
+@@ -413,4 +413,14 @@ public class PaperSpigotWorldConfig
+     private void isArmorStandMoveWithoutGravity() {
+         optimizeArmorStandMovement = getBoolean("armor-stand.optimize-movement", false);
+     }
++
++    public boolean optimizeTntMovement = false;
++    private void isOptimizeTnt() {
++        optimizeTntMovement = getBoolean("tnt.optimize-movement", false);
++    }
++
++    public boolean optimizeLiquidExplosions = true;
++    private void isOptimizeLiquidExplosions() {
++        optimizeLiquidExplosions = getBoolean("tnt.optimize-liquid-explosions", true);
++    }
+ }
+-- 
+2.39.5
+

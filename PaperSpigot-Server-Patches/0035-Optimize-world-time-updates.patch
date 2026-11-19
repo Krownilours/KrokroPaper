@@ -1,0 +1,54 @@
+From 2c16e64571294c6af34569375d5bd22e7a3e5686 Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Thu, 19 Nov 2026 16:07:37 +0100
+Subject: [PATCH] Optimize world time updates
+
+
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index b400ce04d..23f1f0349 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -796,11 +796,8 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
+ 
+         SpigotTimings.timeUpdateTimer.startTiming(); // Spigot
+         // Send time updates to everyone, it will get the right time from the world the player is in.
+-        if (this.ticks % 20 == 0) {
+-            for (int i = 0; i < this.getPlayerList().players.size(); ++i) {
+-                EntityPlayer entityplayer = (EntityPlayer) this.getPlayerList().players.get(i);
+-                entityplayer.playerConnection.sendPacket(new PacketPlayOutUpdateTime(entityplayer.world.getTime(), entityplayer.getPlayerTime(), entityplayer.world.getGameRules().getBoolean("doDaylightCycle"))); // Add support for per player time
+-            }
++        for (final WorldServer world : this.worlds) {
++            world.sendWorldTimeUpdate(false);
+         }
+         SpigotTimings.timeUpdateTimer.stopTiming(); // Spigot
+ 
+diff --git a/src/main/java/net/minecraft/server/WorldServer.java b/src/main/java/net/minecraft/server/WorldServer.java
+index 87529552a..09270b7d8 100644
+--- a/src/main/java/net/minecraft/server/WorldServer.java
++++ b/src/main/java/net/minecraft/server/WorldServer.java
+@@ -1215,6 +1215,22 @@ public class WorldServer extends World implements IAsyncTaskHandler {
+ 
+     }
+ 
++    public void sendWorldTimeUpdate(boolean force) {
++        final boolean doDaylight = this.getGameRules().getBoolean("doDaylightCycle");
++        final long dayTime = this.getDayTime();
++        long worldTime = this.getTime();
++        final PacketPlayOutUpdateTime worldPacket = new PacketPlayOutUpdateTime(worldTime, dayTime, doDaylight);
++        for (EntityHuman entityhuman : this.players) {
++            if (!(entityhuman instanceof EntityPlayer) || (!force && (this.server.at() + entityhuman.getId()) % 20 != 0)) {
++                continue;
++            }
++            EntityPlayer entityplayer = (EntityPlayer) entityhuman;
++            long playerTime = entityplayer.getPlayerTime();
++            PacketPlayOutUpdateTime packet = (playerTime == dayTime) ? worldPacket : new PacketPlayOutUpdateTime(worldTime, playerTime, doDaylight);
++            entityplayer.playerConnection.sendPacket(packet);
++        }
++    }
++
+     public Entity getEntity(UUID uuid) {
+         return (Entity) this.entitiesByUUID.get(uuid);
+     }
+-- 
+2.39.5
+

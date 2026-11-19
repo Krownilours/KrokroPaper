@@ -1,0 +1,41 @@
+From e15c13c1687b85b07e8c86cae6aa685bd1d0852c Mon Sep 17 00:00:00 2001
+From: Krownilours <im4kingfr@gmail.com>
+Date: Thu, 19 Nov 2026 18:28:02 +0100
+Subject: [PATCH] Optimize light recalculations
+
+
+diff --git a/src/main/java/net/minecraft/server/Chunk.java b/src/main/java/net/minecraft/server/Chunk.java
+index 97777d1f3..147a2513d 100644
+--- a/src/main/java/net/minecraft/server/Chunk.java
++++ b/src/main/java/net/minecraft/server/Chunk.java
+@@ -331,7 +331,7 @@ public class Chunk {
+     private void a(int i, int j, int k, int l) {
+         if (l > k && this.world.areChunksLoaded(new BlockPosition(i, 0, j), 16)) {
+             for (int i1 = k; i1 < l; ++i1) {
+-                this.world.updateLight(EnumSkyBlock.SKY, new BlockPosition(i, i1, j)); // PaperSpigot - Asynchronous lighting updates
++                this.world.updateBrightness(EnumSkyBlock.SKY, new BlockPosition(i, i1, j), this); // PaperSpigot - Asynchronous lighting updates
+             }
+ 
+             this.q = true;
+diff --git a/src/main/java/net/minecraft/server/World.java b/src/main/java/net/minecraft/server/World.java
+index e14fd2a71..7ba17c87d 100644
+--- a/src/main/java/net/minecraft/server/World.java
++++ b/src/main/java/net/minecraft/server/World.java
+@@ -2554,9 +2554,13 @@ public abstract class World implements IBlockAccess {
+      * PaperSpigot - Asynchronous lighting updates
+      */
+     public boolean updateLight(final EnumSkyBlock enumskyblock, final BlockPosition position) {
++        Chunk chunk = this.getChunkIfLoaded(position.getX() >> 4, position.getZ() >> 4);
++        return updateBrightness(enumskyblock, position, chunk);
++    }
++
++    public boolean updateBrightness(EnumSkyBlock enumskyblock, BlockPosition position, Chunk chunk) {
+         int x = position.getX();
+         int z = position.getZ();
+-        final Chunk chunk = this.getChunkIfLoaded(x >> 4, z >> 4);
+         if (chunk == null || !chunk.areNeighborsLoaded(1)) {
+             return false;
+         }
+-- 
+2.39.5
+
